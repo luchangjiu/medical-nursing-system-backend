@@ -1,0 +1,30 @@
+{
+  "compilerOptions": {
+    "target": "ESNext" /* Set the JavaScript language version for emitted JavaScript and include compatible library declarations. */,
+    "module": "commonjs" /* Specify what module code is generated. */,
+    "baseUrl": ".",
+    "watch": false,
+    "declaration": true /* Generate .d.ts files from TypeScript and JavaScript files in your project. */,
+    "declarationMap": true /* Create sourcemaps for d.ts files. */,
+    "strict": false,
+    "allowJs": true,
+    "experimentalDecorators": true,
+    "outDir": "./build" /* Specify an output folder for all emitted files. */,
+    "esModuleInterop": true /* Emit additional JavaScript to ease support for importing CommonJS modules. This enables 'allowSyntheticDefaultImports' for type compatibility. */,
+    "forceConsistentCasingInFileNames": true /* Ensure that casing is correct in imports. */,
+    "skipLibCheck": true /* Skip type checking all .d.ts files. */,
+    "emitDecoratorMetadata": true,
+    "moduleResolution": "node",
+    "noImplicitAny": false,
+    "paths": {
+      "/@/*": ["./src/*"]
+      // "/#/*": ["./types/*"]
+    }
+  },
+  "include": [
+    "./src/**/*.ts",
+    "./src/**/*.d.ts",
+    "./src/**/*.tsx",
+  ],
+  "exclude": ["node_modules", "build"]
+}

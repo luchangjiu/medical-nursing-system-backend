@@ -1,0 +1,37 @@
+{
+  "name": "medical-nursing-system-backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "build/index.js",
+  "scripts": {
+    "prestart": "tsc --build",
+    "build": "webpack",
+    "dev": "nodemon -e ts,tsx --exec ts-node -r tsconfig-paths/register ./src/app.ts --files"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@types/express": "^4.17.17",
+    "@types/node": "^18.13.0",
+    "better-sqlite3": "^8.1.0",
+    "body-parser": "^1.20.1",
+    "class-validator": "^0.14.0",
+    "dayjs": "^1.11.7",
+    "express": "^4.18.2",
+    "express-jwt": "^8.4.1",
+    "jsonwebtoken": "^9.0.0",
+    "node-polyfill-webpack-plugin": "^2.0.1",
+    "nodemon": "^2.0.20",
+    "reflect-metadata": "^0.1.13",
+    "ts-loader": "^9.4.2",
+    "ts-node": "^10.9.1",
+    "tsconfig-paths": "^4.1.1",
+    "tsconfig-paths-webpack-plugin": "^4.0.0",
+    "typeorm": "^0.3.11",
+    "typescript": "^4.9.5",
+    "webpack": "^5.75.0",
+    "webpack-cli": "^5.0.1",
+    "webpack-node-externals": "^3.0.0"
+  }
+}
