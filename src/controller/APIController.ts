@@ -1,35 +1,27 @@
 import { Controller, Get, Post } from "../server";
-import { UserService } from "../service";
+import { IUserService, UserService } from "../service";
 import { User, Role } from "../store/entity";
-import { RoleRepository, UserRepository } from "../store/repository";
-import { Connection, OpenConnection } from "../store/sqlite";
+import R from "../util/R";
 
 @Controller("/api")
 export default class APIController {
-  constructor() {}
-
-  @Get("/hello")
-  hello() {
-    return "hello world";
+  private UserService: IUserService;
+  constructor() {
+    this.UserService = new UserService();
   }
 
   @Post("/user")
-  async saveUser(u: User) {
-    let us = new UserService();
-    return await us.save(u);
+  async user(u: User) {
+    return await this.UserService.add(u);
   }
 
-  @Post("/role")
-  async saveRole(r: Role) {
-    await OpenConnection();
-    return await RoleRepository.saveRole(r);
+  @Post("/login")
+  async login({ username, passowrd }) {
+    return await this.UserService.login(username, passowrd);
   }
 
-  @Get("/rolelist")
-  async getRoles() {
-    await OpenConnection();
-    var list = await RoleRepository.find();
-
-    return list;
+  @Get("/logout")
+  async logout() {
+    return R.ok("logout suss");
   }
 }

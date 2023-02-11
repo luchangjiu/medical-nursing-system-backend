@@ -1,8 +1,15 @@
 import { Column, Entity, PrimaryColumn } from "typeorm";
-import { IsDate, IsEmail, Length } from "class-validator";
+import { IsDate, IsEmail, IsPhoneNumber, Length } from "class-validator";
+import { IBaseEntity } from "..";
 
 @Entity("t_sys_user")
-export class User {
+export class User implements IBaseEntity {
+  getId() {
+    return this.userId;
+  }
+  setId(id: string) {
+    this.userId = this.userId;
+  }
   @PrimaryColumn({
     type: "char",
     generated: "uuid",
@@ -38,13 +45,19 @@ export class User {
   @Column({
     nullable: true,
   })
+  @IsPhoneNumber("CH")
+  phone: string;
+
+  @Column({
+    nullable: true,
+  })
   remark?: string;
 
   @Column()
   createUser: string;
   @IsDate()
   @Column({
-    default: () => "datetime('now')",
+    default: () => "datetime('now','localtime')",
     type: "text",
   })
   createTime: Date;

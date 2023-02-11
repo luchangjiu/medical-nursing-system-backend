@@ -2,7 +2,7 @@ import { IsDate } from "class-validator";
 import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity("t_sys_dept")
-export default class SysDept {
+export default class Dept {
   @PrimaryGeneratedColumn("uuid")
   deptId: string;
   @Column()
@@ -22,7 +22,7 @@ export default class SysDept {
   createUser: string;
   @IsDate()
   @Column({
-    default: () => "datetime('now')",
+    default: () => "datetime('now','localtime')",
     type: "text",
   })
   createTime: Date;

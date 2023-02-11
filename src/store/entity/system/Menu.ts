@@ -71,7 +71,7 @@ export default class Menu {
   createUser: string;
   @IsDate()
   @Column({
-    default: () => "datetime('now')",
+    default: () => "datetime('now','localtime')",
     type: "text",
   })
   createTime: Date;

@@ -1,14 +1,31 @@
-import { sqliteConnect } from "/@/aop";
+import { BaseService, IBaseService } from "../BaseService";
 import { User } from "/@/store/entity";
-import { UserRepository } from "/@/store/repository";
-export interface IUserService {}
+import { Connection, sqliteConnect } from "/@/store/sqlite";
+import { TokenGenerate } from "/@/util";
+import R from "/@/util/R";
+export interface IUserService extends IBaseService<User> {
+  login(username: string, password: string): Promise<R>;
+}
 
-export class UserService implements IUserService {
-  public count: number = 0;
+export class UserService extends BaseService<User> implements IUserService {
+  constructor() {
+    super(User);
+  }
 
-  @sqliteConnect([User])
-  async save(u) {
-    var result = await UserRepository.save(u);
-    return result;
+  @sqliteConnect()
+  async login(username: string, password: string): Promise<R> {
+    const u = await this.repository.findOne({
+      where: {
+        username,
+        password,
+      },
+    });
+    if (u) {
+      return R.ok("登录成功", {
+        token: TokenGenerate(u.username, u.userId),
+      });
+    } else {
+      return R.fail("登录失败！");
+    }
   }
 }
