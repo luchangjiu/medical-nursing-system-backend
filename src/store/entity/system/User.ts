@@ -4,12 +4,6 @@ import { IBaseEntity } from "..";
 
 @Entity("t_sys_user")
 export class User implements IBaseEntity {
-  getId() {
-    return this.userId;
-  }
-  setId(id: string) {
-    this.userId = this.userId;
-  }
   @PrimaryColumn({
     type: "char",
     generated: "uuid",

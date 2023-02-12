@@ -1,7 +1,5 @@
 import { DataSource } from "typeorm";
-import { Role, User } from "../entity";
-
-const entities = [User, Role];
+import { BindEntities } from "../entity";
 
 export const Connection = new DataSource({
   name: "better-sqlite3",
@@ -9,7 +7,7 @@ export const Connection = new DataSource({
   database: "./data.sqlite",
   logging: true,
   synchronize: true,
-  entities,
+  entities: BindEntities,
 });
 
 export async function OpenConnection(): Promise<DataSource> {

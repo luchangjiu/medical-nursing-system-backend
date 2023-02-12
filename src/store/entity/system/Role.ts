@@ -3,12 +3,7 @@ import { IsDate, IsEmail, Length } from "class-validator";
 import { IBaseEntity } from "..";
 @Entity("t_sys_role")
 export class Role implements IBaseEntity {
-  getId() {
-    return this.roleId;
-  }
-  setId(id: string) {
-    this.roleId = id;
-  }
+
   @PrimaryColumn({
     type: "text",
     generated: "uuid",

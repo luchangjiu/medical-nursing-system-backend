@@ -1,5 +1,5 @@
 import "reflect-metadata";
-import { ObjectLiteral, Repository } from "typeorm";
+import { Repository } from "typeorm";
 import { IBaseEntity } from "../store/entity";
 import { Connection, sqliteConnect } from "../store/sqlite";
 import R from "../util/R";
@@ -16,15 +16,16 @@ export abstract class BaseService<T extends IBaseEntity> {
     this.repository = Connection.getRepository(target);
   }
 
-  public count: number = 0;
   @sqliteConnect()
   async add(u: T): Promise<R> {
-    await this.repository.save(u);
-    return R.ok();
+    let res = await this.repository.insert(u);
+    return R.ok({
+      id: res.identifiers,
+    });
   }
   @sqliteConnect()
   async upd(u: T): Promise<R> {
-    await this.repository.update(u.getId(), u);
+    await this.repository.save(u);
     return R.ok();
   }
   @sqliteConnect()
