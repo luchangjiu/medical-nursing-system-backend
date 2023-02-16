@@ -4,7 +4,7 @@ import { BindEntities } from "../entity";
 export const Connection = new DataSource({
   name: "better-sqlite3",
   type: "better-sqlite3",
-  database: "./data.sqlite",
+  database: "./medical_nursing_db.sqlite",
   logging: true,
   synchronize: true,
   entities: BindEntities,
@@ -20,7 +20,7 @@ export async function CloseConnection(): Promise<void> {
 }
 
 // 拦截注解的函数，并在调用之前 打开数据库连接
-export const sqliteConnect = () => {
+export const SQLiteConnect = () => {
   return (target: any, propertyKey: string, descriptor: PropertyDescriptor) => {
     const oldFn = descriptor.value;
     descriptor.value = async function (...args: any[]) {

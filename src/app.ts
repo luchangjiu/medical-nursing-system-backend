@@ -1,4 +1,3 @@
+import { Controllers } from "./controller";
 import { Server } from "./server";
-var server = new Server();
-server.cross();
-server.run(4002);
+new Server().cross().registerControllers(Controllers).run(4002);

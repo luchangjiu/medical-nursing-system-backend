@@ -1,6 +1,6 @@
 import { ObjectLiteral } from "typeorm";
-import Dept from "/@/store/entity/system/Dept";
-import Menu from "/@/store/entity/system/Menu";
+import { Dept } from "/@/store/entity/system/Dept";
+import { Menu } from "/@/store/entity/system/Menu";
 import { Role } from "/@/store/entity/system/Role";
 import { User } from "/@/store/entity/system/User";
 

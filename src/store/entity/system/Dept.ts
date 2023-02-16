@@ -2,22 +2,30 @@ import { IsDate } from "class-validator";
 import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity("t_sys_dept")
-export default class Dept {
+export class Dept {
   @PrimaryGeneratedColumn("uuid")
   deptId: string;
   @Column()
   deptName: string;
   @Column()
   deptCode: string;
-  @Column()
+  @Column({
+    default: 0,
+  })
   state: number;
-  @Column()
+  @Column({
+    nullable: true,
+  })
   parentDeptId: string;
-  @Column()
+  @Column({
+    default: 0,
+  })
   orderNo: number;
-  @Column()
+  @Column({
+    nullable: true,
+  })
   remark: string;
-  
+
   @Column()
   createUser: string;
   @IsDate()
@@ -36,4 +44,6 @@ export default class Dept {
     nullable: true,
   })
   updateTime?: Date;
+
+  children?: Array<Dept>;
 }

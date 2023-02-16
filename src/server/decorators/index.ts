@@ -1,96 +1,165 @@
-import { Handler } from "../handlers";
-import { HttpMethod, IActionOption, IControllerRegisterInfo } from "../types";
+import "reflect-metadata"
+import {
+  ActionOption,
+  ControllerOption,
+  HttpMethod,
+  RouterOption,
+} from "../types"
 
-export function Controller(path: string) {
+const actionSymbolKey = Symbol("controller:action")
+
+export const ControllerHandles: Array<ControllerHandle> = []
+
+export const Controller = (path?: string): ClassDecorator => {
   return (target: Function) => {
-    Handler.register({
-      path,
-      name: target.name,
-      controller: target,
-      isAction: false,
-    });
-  };
+    const ctrl = Reflect.getMetadata(
+      actionSymbolKey,
+      target,
+    ) as ControllerHandle
+    ctrl.setPath(path)
+    ControllerHandles.push(ctrl)
+  }
 }
 
-const registerAction = (
-  path: string | IActionOption,
-  propertyKey: string,
-  actionValue: Function,
-  method: HttpMethod,
-  targetController: Function
-) => {
-  const regInfo: IControllerRegisterInfo = {
+function registerAction(
+  path: string | null | undefined,
+  target: Object,
+  propertyKey: string | symbol,
+  action?: any,
+  routerOption?: RouterOption,
+) {
+  let ch = Reflect.getMetadata(
+    actionSymbolKey,
+    target.constructor,
+  ) as ControllerHandle
+  const ao: ActionOption = {
     name: propertyKey,
-    action: actionValue,
-    isAction: true,
-    method: method,
-    controller: targetController,
-  };
-  if (typeof path === "string") {
-    regInfo.path = path;
-  } else if (typeof path === "object") {
-    regInfo.path = path.path;
-    regInfo.actionOption = path;
+    path: path as string,
+    routerOption,
+    action,
   }
-  Handler.register(regInfo);
-};
+  if (ch) {
+    ch.addActionOption(ao)
+  } else {
+    ch = new ControllerHandle({
+      name: target.constructor.name,
+      target: target.constructor,
+    })
+    ch.addActionOption(ao)
+    Reflect.defineMetadata(actionSymbolKey, ch, target.constructor)
+  }
+}
 
-export const Get = (path: string) => {
-  return (target, propertyKey: string, descriptor: PropertyDescriptor) => {
+export const Action = (routerOption?: RouterOption): MethodDecorator => {
+  return (
+    target: Object,
+    propertyKey: string | symbol,
+    descriptor: PropertyDescriptor,
+  ) => {
+    routerOption.method ||= HttpMethod.GET
     registerAction(
-      path,
+      routerOption.router,
+      target,
       propertyKey,
       descriptor.value,
-      HttpMethod.GET,
-      target.constructor
-    );
-  };
-};
+      routerOption,
+    )
+  }
+}
 
-export const Put = (path: string) => {
+export const Get = (path: string): MethodDecorator => {
   return (target, propertyKey: string, descriptor: PropertyDescriptor) => {
-    registerAction(
-      path,
-      propertyKey,
-      descriptor.value,
-      HttpMethod.PUT,
-      target.constructor
-    );
-  };
-};
+    registerAction(path, target, propertyKey, descriptor.value, {
+      router: path,
+      method: HttpMethod.GET,
+    })
+  }
+}
 
-export const Post = (path: string) => {
+export const Put = (path: string): MethodDecorator => {
   return (target, propertyKey: string, descriptor: PropertyDescriptor) => {
-    registerAction(
-      path,
-      propertyKey,
-      descriptor.value,
-      HttpMethod.POST,
-      target.constructor
-    );
-  };
-};
+    registerAction(path, target, propertyKey, descriptor.value, {
+      router: path,
+      method: HttpMethod.GET,
+    })
+  }
+}
 
-export const Delete = (path: string) => {
+export const Post = (path: string): MethodDecorator => {
   return (target, propertyKey: string, descriptor: PropertyDescriptor) => {
-    registerAction(
-      path,
-      propertyKey,
-      descriptor.value,
-      HttpMethod.DELETE,
-      target.constructor
-    );
-  };
-};
+    registerAction(path, target, propertyKey, descriptor.value, {
+      router: path,
+      method: HttpMethod.POST,
+    })
+  }
+}
 
-export const NeedAuth = () => {
+export const Delete = (path: string): MethodDecorator => {
   return (target, propertyKey: string, descriptor: PropertyDescriptor) => {
-    Handler.NeedAuthAttrs.push({
-      action: descriptor.value,
-      controller: target.constructor,
-      actionName: propertyKey,
-    });
-  };
-};
+    registerAction(path, target, propertyKey, descriptor.value, {
+      router: path,
+      method: HttpMethod.DELETE,
+    })
+  }
+}
 
-// export { Controller, Get, Post, Delete, Put, NeedAuth };
+export class ControllerHandle {
+  private controllerOption: ControllerOption
+  private actionOptions: ActionOption[]
+  private controllerInstance: any
+  constructor(controllerOption: ControllerOption) {
+    this.controllerOption = controllerOption
+    this.actionOptions = []
+  }
+
+  setPath(path: string) {
+    this.controllerOption.path = path
+  }
+
+  addActionOption(ao: ActionOption) {
+    this.actionOptions.push(ao)
+  }
+
+  getActionOptions() {
+    return this.actionOptions
+  }
+
+  resolveApiPath(actionOption: ActionOption) {
+    const prefix =
+      this.controllerOption.path || this.toApiName(this.controllerOption.name)
+    const apiName = `${prefix}/${
+      actionOption.path || this.toApiName(actionOption.name as string)
+    }`
+    return apiName.replaceAll(/\/+/g, "/")
+  }
+
+  getControllerOption() {
+    return this.controllerOption
+  }
+
+  getControllerInstance() {
+    if (this.controllerInstance) return this.controllerInstance
+    if (this.controllerOption.target)
+      return (this.controllerInstance = new this.controllerOption.target())
+    throw new Error("controller info initial error !! ")
+  }
+
+  private toApiName(controllerName) {
+    let str = controllerName.replace("Controller", "")
+    let apiName = "/"
+    const c = str[0]
+    apiName += c.toLowerCase()
+    for (let i = 1; i < str.length; i++) {
+      const s = str[i]
+      const code = s.charCodeAt(0)
+      if (code >= 65 && code <= 90) {
+        // 大写处理
+        apiName += "-" + s.toLocaleLowerCase()
+      } else {
+        //if (code >= 97 && code <= 122) {
+        apiName += s
+      }
+    }
+    return apiName
+  }
+}

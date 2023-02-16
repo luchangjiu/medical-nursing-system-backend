@@ -1,27 +1,39 @@
-import { Controller, Get, Post } from "../server";
-import { IUserService, UserService } from "../service";
-import { User, Role } from "../store/entity";
-import R from "../util/R";
+import { Action, Controller, Get, Post } from "../server"
+import { HttpMethod } from "../server/types"
+import { IUserService, UserService } from "../service"
+import { User, Role } from "../store/entity"
+import R from "../util/R"
 
 @Controller("/api")
 export default class APIController {
-  private UserService: IUserService;
+  private UserService: IUserService
+  count: number = 0
   constructor() {
-    this.UserService = new UserService();
+    this.UserService = new UserService()
+  }
+
+  @Action({
+    router: "/test",
+    headers: true,
+    auth: true,
+  })
+  test({ $data }) {
+    console.log($data)
+    return R.ok({ count: this.count++ })
   }
 
   @Post("/user")
-  async user(u: User) {
-    return await this.UserService.add(u);
+  user(u: User) {
+    return this.UserService.add(u)
   }
 
   @Post("/login")
-  async login({ username, passowrd }) {
-    return await this.UserService.login(username, passowrd);
+  login({ username, passowrd }) {
+    return this.UserService.login(username, passowrd)
   }
 
   @Get("/logout")
-  async logout() {
-    return R.ok("logout suss");
+  logout() {
+    return R.ok("logout suss")
   }
 }

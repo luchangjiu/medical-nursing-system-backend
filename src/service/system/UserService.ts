@@ -1,6 +1,6 @@
 import { BaseService, IBaseService } from "../BaseService";
 import { User } from "/@/store/entity";
-import { Connection, sqliteConnect } from "/@/store/sqlite";
+import { SQLiteConnect } from "/@/store/sqlite";
 import { TokenGenerate } from "/@/util";
 import R from "/@/util/R";
 export interface IUserService extends IBaseService<User> {
@@ -12,7 +12,7 @@ export class UserService extends BaseService<User> implements IUserService {
     super(User);
   }
 
-  @sqliteConnect()
+  @SQLiteConnect()
   async login(username: string, password: string): Promise<R> {
     const u = await this.repository.findOne({
       where: {
