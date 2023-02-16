@@ -21,4 +21,4 @@ tests/**/coverage/
 *.sln
 tsconfig.tsbuildinfo
 
-data.sqlite
+medical_nursing_database.sqlite
